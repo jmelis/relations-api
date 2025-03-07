@@ -1,0 +1,26 @@
+schema: |-
+    definition rbac/principal {}
+    
+    definition rbac/group {
+        relation t_direct_member: rbac/principal
+        permission member = t_direct_member
+    }
+    
+    definition rbac/role_binding {
+        relation t_to_cnv_view: rbac/principal:*
+        relation t_to_cnv_edit: rbac/principal:*
+        relation t_to_cnv_admin: rbac/principal:*
+    
+        relation t_subject: rbac/principal | rbac/group#member
+    
+        permission cnv_view = t_to_cnv_view & subject
+        permission cnv_edit = t_to_cnv_edit & subject
+        permission cnv_admin = t_to_cnv_admin & subject
+    }
+    
+    definition k8s/namespace {
+        relation t_binding: rbac/role_binding
+        permission cnv_view = binding->cnv_view
+        permission cnv_edit = binding->cnv_edit
+        permission cnv_admin = binding->cnv_admin
+    }

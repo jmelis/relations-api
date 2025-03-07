@@ -6,8 +6,8 @@ services:
       - "SPICEDB_SCHEMA_FILE=/schema_file"
       # - "SPICEDB_PRESHARED_FILE=/run/secrets/spicedb_pre_shared"
       - "SPICEDB_ENDPOINT=spicedb:50051"
-    build:
-      dockerfile: Dockerfile
+    # build:
+    #   dockerfile: Dockerfile
     profiles: ["relations-api"]
     secrets:
       - spicedb_pre_shared
