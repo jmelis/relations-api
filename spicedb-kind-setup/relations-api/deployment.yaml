@@ -1,3 +1,35 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: spicedb-schema
+data:
+  schema.zed: |
+    definition rbac/principal {}
+
+    definition rbac/group {
+        relation direct_member: rbac/principal
+        permission member = direct_member
+    }
+
+    definition rbac/role_binding {
+        relation to_cnv_view: rbac/principal:*
+        relation to_cnv_edit: rbac/principal:*
+        relation to_cnv_admin: rbac/principal:*
+
+        relation subject: rbac/principal | rbac/group#member
+
+        permission cnv_view = to_cnv_view & subject
+        permission cnv_edit = to_cnv_edit & subject
+        permission cnv_admin = to_cnv_admin & subject
+    }
+
+    definition k8s/namespace {
+        relation binding: rbac/role_binding
+        permission cnv_view = binding->cnv_view
+        permission cnv_edit = binding->cnv_edit
+        permission cnv_admin = binding->cnv_admin
+    }
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -18,6 +50,7 @@ spec:
       containers:
         - name: relationships
           image: quay.io/cloudservices/kessel-relations:latest
+          # image: quay.io/redhat-services-prod/project-kessel-tenant/kessel-relations/relations-api:latest
           ports:
             - containerPort: 8000
             - containerPort: 9000
@@ -27,5 +60,35 @@ spec:
                 secretKeyRef:
                   key: preshared_key
                   name: dev-spicedb-config
+                  # name: spicedb-config
             - name: SPICEDB_ENDPOINT
               value: spicedb-cr:50051
+            - name: SPICEDB_SCHEMA_FILE
+              value: /etc/schema/schema.zed
+          livenessProbe:
+            httpGet:
+              path: /api/authz/livez
+              port: 8000
+          readinessProbe:
+            httpGet:
+              path: /api/authz/readyz
+              port: 8000
+          resources:
+            limits:
+              cpu: 300m
+              memory: 1Gi
+            requests:
+              cpu: 150m
+              memory: 512Mi
+          volumeMounts:
+          - mountPath: /etc/schema
+            name: schema
+          # - mountPath: /config
+          #   name: relations-api-config
+      volumes:
+        - configMap:
+            name: spicedb-schema
+          name: schema
+        - configMap:
+            name: relations-api-config
+          name: relations-api-config
