@@ -54,9 +54,7 @@ echo "spicedb is ready"
 kubectl get ingresses.networking.k8s.io -n spicedb
 
 echo "Create schema configmap"
-echo 'schema: |-' > ./spicedb-kind-setup/schema.yaml
-cat ./deploy/schema.zed | sed 's/^/    /' >> ./spicedb-kind-setup/schema.yaml
-kubectl create configmap spicedb-schema --from-file=./spicedb-kind-setup/schema.yaml -n spicedb
+kubectl create configmap spicedb-schema --from-file=./deploy/schema.zed -n spicedb
 
 echo "Deploying relations-api service"
 kubectl apply -f ./spicedb-kind-setup/relations-api/secret.yaml -n spicedb

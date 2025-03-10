@@ -70,3 +70,18 @@ spec:
     - name: spicedb-cr
       port: 50051
       protocol: h2c
+---
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: relations-grpc
+spec:
+  virtualhost:
+    fqdn: relationships-service-grpc.127.0.0.1.nip.io
+  routes:
+  - conditions:
+    - prefix: /
+    services:
+    - name: relationships-service-grpc
+      port: 9000
+      protocol: h2c
