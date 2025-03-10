@@ -56,7 +56,7 @@ kubectl get ingresses.networking.k8s.io -n spicedb
 echo "Create schema configmap"
 echo 'schema: |-' > ./spicedb-kind-setup/schema.yaml
 cat ./deploy/schema.zed | sed 's/^/    /' >> ./spicedb-kind-setup/schema.yaml
-kubectl create configmap spicedb-schema --from-file=./spicedb-kind-setup/schema.yaml
+kubectl create configmap spicedb-schema --from-file=./spicedb-kind-setup/schema.yaml -n spicedb
 
 echo "Deploying relations-api service"
 kubectl apply -f ./spicedb-kind-setup/relations-api/secret.yaml -n spicedb
@@ -75,5 +75,3 @@ echo "Relations - Write(POST) - Sample CURL request"
 echo ""
 JSON_DATA='{"tuples":[{"resource":{"id":"bob_club","type":{"name":"group","namespace":"rbac"}},"relation":"member","subject":{"subject":{"id":"bob","type":{"name":"principal","namespace":"rbac"}}}}]}'
 echo "curl -v http://relationships.127.0.0.1.nip.io:8000/api/authz/v1beta1/tuples -H 'Content-Type: application/json' -d '$JSON_DATA'"
-
-curl -v http://localhost:8000/api/authz/v1beta1/tuples -H 'Content-Type: application/json' -d "$JSON_DATA"

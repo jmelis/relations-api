@@ -1,35 +1,3 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: spicedb-schema
-data:
-  schema.zed: |
-    definition rbac/principal {}
-
-    definition rbac/group {
-        relation direct_member: rbac/principal
-        permission member = direct_member
-    }
-
-    definition rbac/role_binding {
-        relation to_cnv_view: rbac/principal:*
-        relation to_cnv_edit: rbac/principal:*
-        relation to_cnv_admin: rbac/principal:*
-
-        relation subject: rbac/principal | rbac/group#member
-
-        permission cnv_view = to_cnv_view & subject
-        permission cnv_edit = to_cnv_edit & subject
-        permission cnv_admin = to_cnv_admin & subject
-    }
-
-    definition k8s/namespace {
-        relation binding: rbac/role_binding
-        permission cnv_view = binding->cnv_view
-        permission cnv_edit = binding->cnv_edit
-        permission cnv_admin = binding->cnv_admin
-    }
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
