@@ -21,7 +21,7 @@ services:
       - kessel
 
   spicedb:
-    image: "authzed/spicedb"
+    image: "authzed/spicedb:v1.41.0"
     command: "serve"
     restart: "always"
     ports:

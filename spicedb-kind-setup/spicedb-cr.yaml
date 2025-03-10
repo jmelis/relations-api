@@ -10,7 +10,7 @@ spec:
     datastoreEngine: postgres
     #datastoreTLSSecretName: datastore-tls
     replicas: 2
-    image: ghcr.io/authzed/spicedb:v1.31.0
+    image: ghcr.io/authzed/spicedb:v1.41.0
   secretName: spicedb-config
 ---
 apiVersion: v1
