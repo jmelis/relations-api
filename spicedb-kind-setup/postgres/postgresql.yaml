@@ -32,6 +32,7 @@ spec:
       containers:
       - image: postgres:latest
         name: postgres
+        args: ["-c", "track_commit_timestamp=on"]
         envFrom:
           - secretRef:
               name: postgres-credentials
